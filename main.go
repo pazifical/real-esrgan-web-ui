@@ -149,33 +149,33 @@ func HandleUpscale(w http.ResponseWriter, r *http.Request) {
 
 		var buf bytes.Buffer
 
-		file, header, err := r.FormFile("file")
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(422)
-			return
-		}
-		defer file.Close()
-		log.Printf("INFO: received image %s", header.Filename)
+		for _, formFile := range r.MultipartForm.File["file"] {
+			log.Printf("INFO: received image %s", formFile.Filename)
+			file, err := formFile.Open()
+			if err != nil {
+				log.Printf("ERROR: %s", err)
+				continue
+			}
+			defer file.Close()
 
-		_, err = io.Copy(&buf, file)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(422)
-			return
-		}
+			_, err = io.Copy(&buf, file)
+			if err != nil {
+				log.Printf("ERROR: %s", err)
+				continue
+			}
 
-		f, err := os.Create(filepath.Join(inputDirectory, header.Filename))
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(422)
-			return
-		}
-		defer f.Close()
-		f.Write(buf.Bytes())
-		buf.Reset()
+			f, err := os.Create(filepath.Join(inputDirectory, formFile.Filename))
+			if err != nil {
+				log.Printf("ERROR: %s", err)
+				continue
+			}
+			defer f.Close()
+			f.Write(buf.Bytes())
 
-		unprocessedFiles[header.Filename] = header.Filename
+			buf.Reset()
+
+			unprocessedFiles[formFile.Filename] = formFile.Filename
+		}
 
 		w.WriteHeader(200)
 	} else {

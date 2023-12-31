@@ -1,33 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Real-ESRGAN</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
 
-  <body>
-    <header>
-      <h1>Real-ESRGAN Web UI</h1>
-    </header>
-    <main>
-      <section>
-        <h3>Upload a file for upscaling</h3>
-        <form id="upload-form" enctype="multipart/form-data">
-          <input id="upload-file" name="file" type="file" />
-        </form>
-        <p id="upload-info"></p>
-      </section>
-      <section>
-        <h3>Upscaled images</h3>
-        <div
-          style="display: flex; gap: 1rem; flex-wrap: wrap"
-          id="processed"
-        ></div>
-      </section>
-    </main>
-    <script src="index.js"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Real-ESRGAN</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header>
+    <h1>Real-ESRGAN Web UI</h1>
+  </header>
+  <main>
+    <section>
+      <h3>Upload a file for upscaling</h3>
+      <form id="upload-form" enctype="multipart/form-data">
+        <input id="upload-file" name="file" type="file" multiple />
+      </form>
+      <p id="upload-info"></p>
+    </section>
+    <section>
+      <h3>Upscaled images</h3>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap" id="processed"></div>
+    </section>
+  </main>
+  <script src="index.js"></script>
+</body>
+
 </html>
