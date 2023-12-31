@@ -14,6 +14,7 @@ https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install
 ## Docker
 
 ### Build the container
+
 ```
 docker build -t real_esrgan_web_ui .
 ```
@@ -21,5 +22,9 @@ docker build -t real_esrgan_web_ui .
 ```
 ### Run the container
 ```
-docker run --rm -d -p 8000:8000 --runtime=nvidia --gpus all --name real_esrgan_web_ui real_esrgan_web_ui
+
+docker run --rm -d -p 8080:8080 --runtime=nvidia --gpus all --name real_esrgan_web_ui real_esrgan_web_ui
+
+```
+
 ```
