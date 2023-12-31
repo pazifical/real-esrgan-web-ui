@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"time"
 )
@@ -23,11 +24,33 @@ var port = 8080
 func processFile(filename string) error {
 	log.Printf("INFO: processing file %s", filename)
 
-	err := os.Rename(filepath.Join(inputDirectory, filename), filepath.Join(outputDirectory, filename))
+	filepath := filepath.Join(inputDirectory, filename)
+	cmd := exec.Command(
+		"python3",
+		"./Real-ESRGAN/inference_realesrgan.py",
+		"-n",
+		"RealESRGAN_x4plus",
+		"-i",
+		filepath,
+		"-o",
+		outputDirectory,
+	)
+	fmt.Println(cmd)
+	var stdout, errout bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &errout
+
+	err := cmd.Run()
+	fmt.Println(stdout.String())
+	fmt.Println(errout.String())
 	if err != nil {
 		return err
 	}
 
+	err = os.Remove(filepath)
+	if err != nil {
+		return err
+	}
 	delete(unprocessedFiles, filename)
 	processedFiles[filename] = filename
 
@@ -36,10 +59,13 @@ func processFile(filename string) error {
 
 func startFileProcessor() {
 	for {
-		time.Sleep(time.Second * 10)
 		for _, imagePath := range unprocessedFiles {
-			processFile(imagePath)
+			err := processFile(imagePath)
+			if err != nil {
+				log.Printf("ERROR: %s", err)
+			}
 		}
+		time.Sleep(time.Second * 10)
 	}
 }
 
