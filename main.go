@@ -17,6 +17,7 @@ var staticDirectory = "static"
 var dataDirectory = "data"
 var inputDirectory = filepath.Join(dataDirectory, "input")
 var outputDirectory = filepath.Join(dataDirectory, "output")
+var downloadPath = "/download/"
 var unprocessedFiles = make(map[string]string, 0)
 var processedFiles = make(map[string]string, 0)
 var port = 8080
@@ -112,23 +113,28 @@ func main() {
 	go startFileProcessor()
 
 	http.Handle("/", http.FileServer(http.Dir(staticDirectory)))
-	http.Handle("/upscaled", http.FileServer(http.Dir(outputDirectory)))
+	http.Handle(downloadPath, http.StripPrefix(downloadPath, http.FileServer(http.Dir(outputDirectory))))
 	http.HandleFunc("/api/upscale", HandleUpscale)
 
 	log.Printf("Open a web browser and go to http://localhost:%d", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }
 
+type ProcessedImage struct {
+	Name     string `json:"name"`
+	Filepath string `json:"filepath"`
+}
+
 func HandleUpscale(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(processedFiles)
-		err := readProcessedFiles()
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(422)
-			return
+		list := make([]ProcessedImage, 0)
+		for _, filename := range processedFiles {
+			fPath := filepath.Join(downloadPath, filename)
+			list = append(list, ProcessedImage{Name: filename, Filepath: fPath})
 		}
+		json.NewEncoder(w).Encode(list)
+
 	} else if r.Method == "POST" {
 		err := r.ParseMultipartForm(32 << 20)
 		if err != nil {
