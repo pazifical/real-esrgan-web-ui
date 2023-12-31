@@ -25,18 +25,18 @@ var port = 8080
 func processFile(filename string) error {
 	log.Printf("INFO: processing file %s", filename)
 
-	filepath := filepath.Join(inputDirectory, filename)
+	fPath := filepath.Join(inputDirectory, filename)
 	cmd := exec.Command(
 		"python3",
 		"./Real-ESRGAN/inference_realesrgan.py",
 		"-n",
 		"RealESRGAN_x4plus",
 		"-i",
-		filepath,
+		fPath,
 		"-o",
 		outputDirectory,
 	)
-	fmt.Println(cmd)
+
 	var stdout, errout bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &errout
@@ -48,12 +48,16 @@ func processFile(filename string) error {
 		return err
 	}
 
-	err = os.Remove(filepath)
+	err = os.Remove(fPath)
 	if err != nil {
 		return err
 	}
 	delete(unprocessedFiles, filename)
-	processedFiles[filename] = filename
+
+	err = readProcessedFiles()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -20,7 +20,9 @@ async function updateList() {
     const response = await fetch("/api/upscale");
     const images = await response.json();
 
-    document.getElementById("processed").innerHTML = images.map(i => `<li>${i.name} <a href="${i.filepath}">Open</a></li>`)
+    document.getElementById("processed").innerHTML = images.toSorted((a, b) => a.name > b.name)
+        .map(i => `<li>${i.name} <a href="${i.filepath}">Open</a></li>`)
+        .join("")
 }
 
-window.setTimeout(updateList, 1000);
+setInterval(updateList, 2000);
