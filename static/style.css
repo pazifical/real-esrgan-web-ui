@@ -7,9 +7,9 @@
 :root {
   --color-dark: hsl(0 0% 10%);
   --color-bright: hsl(0 0% 95%);
-  --color-primary: #06c;
-  --color-secondary: rgb(121, 179, 238);
-  --color-highlight: rgb(236, 134, 0);
+  --color-primary: #7a6d63;
+  --color-secondary: #d5bfac;
+  --color-highlight: #88C7CF;
   --color-yellow: #fcd116;
   --color-blue: #003893;
   --color-red: #ce1126;
@@ -17,7 +17,7 @@
 
 header {
   background-color: var(--color-dark);
-  color: var(--color-bright);
+  color: var(--color-highlight);
   padding: 1rem;
 }
 
@@ -31,7 +31,7 @@ h4,
 h5,
 h6 {
   padding: 0.5rem 0;
-  text-decoration: underline;
+  text-decoration: underline var(--color-highlight) 2px;
 }
 
 ul {
@@ -44,10 +44,11 @@ section {
   padding: 1rem;
   background-color: var(--color-secondary);
 }
+
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--color-bright);
+  background-color: var(--color-primary);
   color: var(--color-dark);
 }
 

@@ -9,7 +9,7 @@ document.getElementById("upload-file").onchange = async (event) => {
   if (response.ok) {
     document.getElementById(
       "upload-info"
-    ).innerText = `Successfully uploaded ${event.target.value}`;
+    ).innerText = "Upload successful";
     event.target.value = "";
   }
 

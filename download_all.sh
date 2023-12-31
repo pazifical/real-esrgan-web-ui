@@ -1,0 +1,1 @@
+curl http://localhost:8080/api/upscale | jq .[]."filepath" | sed  "s/\/download/http:\/\/localhost:8080\/download/" | xargs wget

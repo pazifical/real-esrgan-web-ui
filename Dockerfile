@@ -5,6 +5,7 @@ FROM golang:1.21 AS build
 WORKDIR /app
 COPY main.go .
 COPY go.mod .
+COPY internal internal
 RUN go build .
 
 # Building Real-ESRGAN container
