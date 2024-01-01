@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Server struct {
 	mux       *http.ServeMux
 	port      int
-	processor Processor
+	processor *Processor
 }
 
-func NewServer(config Config, processor Processor) Server {
+func NewServer(config Config, processor *Processor) Server {
 	server := Server{processor: processor, port: config.Port}
 	mux := http.NewServeMux()
 	mux.Handle("/", http.FileServer(http.Dir(config.StaticDirectory)))
@@ -34,6 +35,8 @@ func (s *Server) handleUpscale(w http.ResponseWriter, r *http.Request) {
 		s.handleGet(w, r)
 	case "POST":
 		s.handlePost(w, r)
+	case "DELETE":
+		s.handleDelete(w, r)
 	default:
 		w.WriteHeader(405)
 	}
@@ -45,6 +48,16 @@ func (s *Server) handleGet(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(list)
 }
 
+func (s *Server) handleDelete(w http.ResponseWriter, r *http.Request) {
+	err := s.processor.DeleteAllProcessed()
+	if err != nil {
+		log.Printf("ERROR: %s", err)
+		w.WriteHeader(500)
+		return
+	}
+	w.WriteHeader(200)
+}
+
 func (s *Server) handlePost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(32 << 20)
 	if err != nil {
@@ -52,6 +65,13 @@ func (s *Server) handlePost(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(422)
 		return
 	}
+
+	upscaleFactor, err := strconv.Atoi(r.FormValue("factor"))
+	if err != nil {
+		log.Printf("ERROR: %s", err)
+		upscaleFactor = 2
+	}
+	s.processor.UpscaleFactor = upscaleFactor
 
 	for _, formFile := range r.MultipartForm.File["file"] {
 		log.Printf("INFO: received image %s", formFile.Filename)

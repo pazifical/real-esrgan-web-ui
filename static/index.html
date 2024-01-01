@@ -1,32 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Real-ESRGAN</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>Real-ESRGAN</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-  <header>
-    <h1>Real-ESRGAN Web UI</h1>
-  </header>
-  <main>
-    <section>
-      <h3>Upload a file for upscaling</h3>
-      <form id="upload-form" enctype="multipart/form-data">
-        <input id="upload-file" name="file" type="file" multiple />
-      </form>
-      <p id="upload-info"></p>
-    </section>
-    <section>
-      <h3>Upscaled images</h3>
-      <div style="display: flex; gap: 1rem; flex-wrap: wrap" id="processed"></div>
-    </section>
-  </main>
-  <script src="index.js"></script>
-</body>
-
+  <body>
+    <header>
+      <div class="flex">
+        <h1>Real-ESRGAN Web UI</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+          <label for="upload-file" id="upload-label" class="button">
+            <input id="upload-file" name="file" type="file" multiple />
+            Upload files for upscaling
+          </label>
+        </form>
+      </div>
+      <div id="settings">
+        <label>Upscale factor:</label>
+        <select id="upscale-factor">
+          <option value="2">2x</option>
+          <option value="3">3x</option>
+          <option value="4">4x</option>
+        </select>
+      </div>
+    </header>
+    <main>
+      <section>
+        <div class="flex">
+          <h3>Upscaled images</h3>
+          <button id="delete-all" class="button">Delete all</button>
+        </div>
+        <div class="h-line-1"></div>
+        <div class="h-line-2"></div>
+        <div class="box">
+          <div id="gallery" class="gallery"></div>
+        </div>
+        <div class="h-line-2"></div>
+        <div class="h-line-1"></div>
+      </section>
+    </main>
+    <script src="index.js"></script>
+  </body>
 </html>

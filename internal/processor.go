@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
+	"strconv"
 	"time"
 )
 
@@ -18,28 +20,30 @@ type Processor struct {
 	downloadPath     string
 	inputDirectory   string
 	outputDirectory  string
+	UpscaleFactor    int
 }
 
-func NewProcessor(config Config) (Processor, error) {
+func NewProcessor(config Config) (*Processor, error) {
 	processor := Processor{
 		processedFiles:   make(map[string]string, 0),
 		unprocessedFiles: make(map[string]string, 0),
 		downloadPath:     config.DownloadPath,
 		inputDirectory:   config.InputDirectory,
 		outputDirectory:  config.OutputDirectory,
+		UpscaleFactor:    2,
 	}
 
 	err := processor.readProcessedFiles()
 	if err != nil {
-		return processor, err
+		return nil, err
 	}
 
 	err = processor.readUnprocessedFiles()
 	if err != nil {
-		return processor, err
+		return nil, err
 	}
 
-	return processor, nil
+	return &processor, nil
 }
 
 func (p *Processor) GetProcessedImages() []ProcessedImage {
@@ -48,6 +52,7 @@ func (p *Processor) GetProcessedImages() []ProcessedImage {
 		fPath := filepath.Join(p.downloadPath, filename)
 		list = append(list, ProcessedImage{Name: filename, Filepath: fPath})
 	}
+	sort.Sort(ByName(list))
 	return list
 }
 
@@ -88,6 +93,8 @@ func (p *Processor) processFile(filename string) error {
 		"./Real-ESRGAN/inference_realesrgan.py",
 		"-n",
 		"RealESRGAN_x4plus",
+		"-s",
+		strconv.Itoa(p.UpscaleFactor),
 		"-i",
 		fPath,
 		"-o",
@@ -127,7 +134,7 @@ func (p *Processor) Start() {
 				log.Printf("ERROR: %s", err)
 			}
 		}
-		time.Sleep(time.Second * 10)
+		time.Sleep(time.Second * 2)
 	}
 }
 
@@ -150,6 +157,23 @@ func (p *Processor) readUnprocessedFiles() error {
 	p.unprocessedFiles = make(map[string]string, 0)
 	for _, file := range files {
 		p.unprocessedFiles[file.Name()] = file.Name()
+	}
+	return nil
+}
+
+func (p *Processor) DeleteAllProcessed() error {
+	files, err := os.ReadDir(p.outputDirectory)
+	if err != nil {
+		return err
+	}
+	for _, file := range files {
+		fPath := filepath.Join(p.outputDirectory, file.Name())
+		err := os.Remove(fPath)
+		if err != nil {
+			log.Printf("WARNING: %s", err)
+			continue
+		}
+		delete(p.processedFiles, file.Name())
 	}
 	return nil
 }
